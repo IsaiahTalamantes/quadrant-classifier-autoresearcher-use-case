@@ -70,3 +70,7 @@ Starting from a verified baseline of **0.795** validation accuracy (see `baselin
 - Original autoresearch concept: [Andrej Karpathy](https://github.com/karpathy)
 - Gaudi (HPU) port: [thediymaker](https://github.com/thediymaker/autoresearch-gaudi)
 - Classifier, Kubernetes orchestration, and this use case: Isaiah Talamantes
+
+
+- Grad-CAM technique reference/implementation guidance: [jacobgil/pytorch-grad-cam](https://github.com/jacobgil/pytorch-grad-cam) (MIT License)
+- Original Grad-CAM paper: Selvaraju et al., "Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization" (https://arxiv.org/abs/1610.02391)
