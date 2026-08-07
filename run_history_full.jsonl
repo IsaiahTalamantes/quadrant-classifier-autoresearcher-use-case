@@ -1,1 +1,6 @@
 {"iteration": 0, "event": "baseline", "val_acc": 0.79125, "ts": 1786062918.1540253}
+{"iteration": 1, "event": "scored", "val_acc": 0.795, "kept": true, "best_val_acc": 0.795, "ts": 1786065372.0060103}
+{"iteration": 2, "event": "scored", "val_acc": 0.79625, "kept": true, "best_val_acc": 0.79625, "ts": 1786068418.345698}
+{"iteration": 3, "event": "scored", "val_acc": 0.7375, "kept": false, "best_val_acc": 0.79625, "ts": 1786073472.3479743}
+{"iteration": 4, "event": "scored", "val_acc": 0.8075, "kept": true, "best_val_acc": 0.8075, "ts": 1786077524.1949644}
+{"iteration": 5, "event": "scored", "val_acc": 0.81375, "kept": true, "best_val_acc": 0.81375, "ts": 1786082602.163456}
