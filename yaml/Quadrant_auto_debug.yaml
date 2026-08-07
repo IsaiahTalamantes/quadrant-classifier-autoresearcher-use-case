@@ -1,0 +1,23 @@
+apiVersion: batch/v1 
+kind: Job
+metadata: 
+  name: gaudi-debug-job-quadrant 
+  namespace: user-irtalama 
+spec: 
+  template:
+    spec: 
+      containers:
+      - name: gaudi-debug 
+        image: vault.habana.ai/gaudi-docker/1.24.0/ubuntu24.04/habanalabs/pytorch-installer-2.10.0:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - | 
+            hl-smi
+            sleep 3600
+        resources:
+          limits:
+            habana.ai/gaudi: 1 
+          requests:
+            habana.ai/gaudi: 1 
+      restartPolicy: Never
+  backoffLimit: 0 

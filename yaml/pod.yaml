@@ -1,0 +1,220 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2026-07-17T23:12:39Z"
+  generateName: quadrant-classifier-hpu-run-
+  generation: 1
+  labels:
+    app: quadrant-classifier
+    batch.kubernetes.io/controller-uid: 9cfc069b-c013-4889-89d2-72d2ebc71531
+    batch.kubernetes.io/job-name: quadrant-classifier-hpu-run
+    controller-uid: 9cfc069b-c013-4889-89d2-72d2ebc71531
+    job-name: quadrant-classifier-hpu-run
+  name: quadrant-classifier-hpu-run-t8srn
+  namespace: user-irtalama
+  ownerReferences:
+  - apiVersion: batch/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Job
+    name: quadrant-classifier-hpu-run
+    uid: 9cfc069b-c013-4889-89d2-72d2ebc71531
+  resourceVersion: "621814155"
+  uid: 4eb0aa91-1b31-47d2-87f8-00fb1d7c6e82
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: longhorn.io/disk-ready
+            operator: In
+            values:
+            - "true"
+          - key: habana.ai/gaudi
+            operator: Exists
+  containers:
+  - command:
+    - /bin/bash
+    - -lc
+    - |
+      set -e
+      echo "--- Starting Dedicated HPU Batch Job ---"
+      pip install matplotlib scipy scikit-learn ttach opencv-python
+      pip install --no-deps grad-cam
+      python3 /data/class.py --data_dir /data/pics --out_dir /data/run_output --fixed_sample_file /data/run_output/gradcam_sample.txt
+    env:
+    - name: HOME
+      value: /data
+    - name: PYTHONUNBUFFERED
+      value: "1"
+    image: vault.habana.ai/gaudi-docker/1.24.0/ubuntu24.04/habanalabs/pytorch-installer-2.10.0:latest
+    imagePullPolicy: IfNotPresent
+    name: quadrant-classifier
+    resources:
+      limits:
+        cpu: "8"
+        habana.ai/gaudi: "1"
+        hugepages-2Mi: 4Gi
+        memory: 64Gi
+      requests:
+        cpu: "8"
+        habana.ai/gaudi: "1"
+        hugepages-2Mi: 4Gi
+        memory: 64Gi
+    securityContext:
+      allowPrivilegeEscalation: true
+      runAsGroup: 0
+      runAsUser: 0
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /data
+      name: data
+    - mountPath: /dev/shm
+      name: shm
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-f5hmm
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostIPC: true
+  nodeName: dcx-gaudi167
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Never
+  runtimeClassName: habana
+  schedulerName: default-scheduler
+  securityContext:
+    fsGroup: 0
+    fsGroupChangePolicy: OnRootMismatch
+    runAsNonRoot: false
+    runAsUser: 0
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoSchedule
+    key: habana
+    operator: Exists
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: quadrantclasspvc
+  - emptyDir:
+      medium: Memory
+      sizeLimit: 8Gi
+    name: shm
+  - name: kube-api-access-f5hmm
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-18T00:10:35Z"
+    observedGeneration: 1
+    status: "False"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-17T23:12:39Z"
+    observedGeneration: 1
+    reason: PodCompleted
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-18T00:10:34Z"
+    observedGeneration: 1
+    reason: PodCompleted
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-18T00:10:34Z"
+    observedGeneration: 1
+    reason: PodCompleted
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-07-17T23:12:39Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - allocatedResources:
+      cpu: "8"
+      habana.ai/gaudi: "1"
+      hugepages-2Mi: 4Gi
+      memory: 64Gi
+    containerID: containerd://be61e2dd1ab27337e3a3cc816053bc87bf0be40c09efa9c5ba91588007db97ce
+    image: vault.habana.ai/gaudi-docker/1.24.0/ubuntu24.04/habanalabs/pytorch-installer-2.10.0:latest
+    imageID: vault.habana.ai/gaudi-docker/1.24.0/ubuntu24.04/habanalabs/pytorch-installer-2.10.0@sha256:6ab4afc902a4adbaabb05da9c533c93b9d2f63f01763cd7b6489de3ff3531bcc
+    lastState: {}
+    name: quadrant-classifier
+    ready: false
+    resources:
+      limits:
+        cpu: "8"
+        habana.ai/gaudi: "1"
+        hugepages-2Mi: 4Gi
+        memory: 64Gi
+      requests:
+        cpu: "8"
+        habana.ai/gaudi: "1"
+        hugepages-2Mi: 4Gi
+        memory: 64Gi
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: containerd://be61e2dd1ab27337e3a3cc816053bc87bf0be40c09efa9c5ba91588007db97ce
+        exitCode: 0
+        finishedAt: "2026-07-18T00:10:33Z"
+        reason: Completed
+        startedAt: "2026-07-17T23:13:17Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /data
+      name: data
+    - mountPath: /dev/shm
+      name: shm
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-f5hmm
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 10.139.65.167
+  hostIPs:
+  - ip: 10.139.65.167
+  observedGeneration: 1
+  phase: Succeeded
+  podIP: 10.42.100.12
+  podIPs:
+  - ip: 10.42.100.12
+  qosClass: Guaranteed
+  startTime: "2026-07-17T23:12:39Z"

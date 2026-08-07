@@ -1,0 +1,99 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: autoresearch-debug-quadrant
+  namespace: user-irtalama
+  labels:
+    app: autoreasearch-debug-quadrant
+spec:
+  template:
+    metadata:
+      labels:
+        app: autoreasearch-debug-quadrant
+    spec:
+      runtimeClassName: habana
+      hostIPC: true
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+      tolerations:
+        - key: "habana"
+          operator: "Exists"
+          effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "longhorn.io/disk-ready"
+                    operator: In
+                    values:
+                      - "true"
+                  - key: "habana.ai/gaudi"
+                    operator: Exists
+      initContainers:
+        - name: clone-repo
+          image: alpine/git:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cd /workspace
+              git clone https://github.com/IsaiahTalamantes/autoresearch-gaudi.git autoresearch
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      containers:
+        - name: gaudi-container 
+          image: vault.habana.ai/gaudi-docker/1.24.0/ubuntu24.04/habanalabs/pytorch-installer-2.10.0:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 0 
+            runAsGroup: 0 
+            allowPrivilegeEscalation: true 
+          command: 
+            - /bin/bash
+            - -lc
+            - | 
+              set -e 
+              mkdir -p /root/.cache/autoresearch 
+              pip install matplotlib scipy scikit-learn ttach opencv-python 
+              pip install --no-deps grad-cam 
+              echo "--- autoresearch-debug-quadrant ready, sleeping ---" 
+              sleep infinity 
+          env: 
+            - name: HOME 
+              value: /root
+            - name: PYTHONUNBUFFERED 
+              value: "1" 
+          resources: 
+            requests: 
+              cpu: "8" 
+              memory: "64Gi"
+              habana.ai/gaudi: "1" 
+              hugepages-2Mi: "4Gi"
+            limits: 
+              cpu: "8" 
+              memory: "64Gi" 
+              habana.ai/gaudi: "1"
+              hugepages-2Mi: "4Gi"
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace 
+            - name: data 
+              mountPath: /data
+            - name: shm 
+              mountPath: /dev/shm
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: data 
+          persistentVolumeClaim:
+            claimName: quadrantclasspvc
+        - name: shm 
+          emptyDir: 
+            medium: Memory
+            sizeLimit: "8Gi"
+    

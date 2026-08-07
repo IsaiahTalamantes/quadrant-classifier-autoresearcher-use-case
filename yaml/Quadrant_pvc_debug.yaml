@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pvc-debug-quadrant
+  namespace: user-irtalama
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "longhorn.io/disk-ready"
+                    operator: In
+                    values:
+                      - "true"
+      containers:
+      - name: debug
+        image: busybox:latest
+        command: ["sleep", "3600"]
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: quadrantclasspvc
+      restartPolicy: Never

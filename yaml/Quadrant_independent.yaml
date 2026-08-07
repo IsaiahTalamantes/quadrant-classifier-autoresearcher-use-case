@@ -1,0 +1,90 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: quadrant-classifier-hpu-run-v2
+  namespace: user-irtalama
+  labels:
+    app: quadrant-classifier
+spec:
+  template:
+    metadata:
+      labels:
+        app: quadrant-classifier
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: longhorn.io/disk-ready
+                operator: In
+                values:
+                - "true"
+              - key: habana.ai/gaudi
+                operator: Exists
+      containers:
+      - name: quadrant-classifier
+        image: vault.habana.ai/gaudi-docker/1.24.0/ubuntu24.04/habanalabs/pytorch-installer-2.10.0:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - -lc
+        - |
+          set -e
+          echo "--- Starting Dedicated HPU Batch Job ---"
+          pip install matplotlib scipy scikit-learn ttach opencv-python
+          pip install --no-deps grad-cam
+          python3 /data/class.py --data_dir /data/pics --out_dir /data/run_output --fixed_sample_file /data/run_output/gradcam_sample.txt
+        env:
+        - name: HOME
+          value: /data
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        resources:
+          limits:
+            cpu: "8"
+            habana.ai/gaudi: "1"
+            hugepages-2Mi: 4Gi
+            memory: 64Gi
+          requests:
+            cpu: "8"
+            habana.ai/gaudi: "1"
+            hugepages-2Mi: 4Gi
+            memory: 64Gi
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsGroup: 0
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: data
+        - mountPath: /dev/shm
+          name: shm
+      hostIPC: true
+      restartPolicy: Never
+      runtimeClassName: habana
+      securityContext:
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: false
+        runAsUser: 0
+      tolerations:
+      - effect: NoSchedule
+        key: habana
+        operator: Exists
+      - effect: NoExecute
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 300
+      - effect: NoExecute
+        key: node.kubernetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 300
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: quadrantclasspvc
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi

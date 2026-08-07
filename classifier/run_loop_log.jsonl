@@ -1,0 +1,18 @@
+{"iteration": 0, "event": "baseline", "val_acc": 0.705, "ts": 1784740432.0964522}
+{"iteration": 1, "event": "crash", "error": "scorer timed out", "best_val_acc": 0.705, "ts": 1784742266.1328557}
+{"iteration": 2, "event": "crash", "error": "no parseable metrics JSON in log (run did not produce valid output)", "best_val_acc": 0.705, "ts": 1784742313.0582554}
+{"iteration": 0, "event": "baseline", "val_acc": 0.70875, "ts": 1784748038.583067}
+{"iteration": 1, "event": "crash", "error": "no parseable metrics JSON in log (run did not produce valid output)", "best_val_acc": 0.70875, "ts": 1784748111.269909}
+{"iteration": 0, "event": "baseline", "val_acc": 0.8, "ts": 1784756683.873985}
+{"iteration": 1, "event": "scored", "val_acc": 0.8, "kept": false, "best_val_acc": 0.8, "ts": 1784756973.6258779}
+{"iteration": 2, "event": "scored", "val_acc": 0.79375, "kept": false, "best_val_acc": 0.8, "ts": 1784761025.8738022}
+{"iteration": 3, "event": "scored", "val_acc": 0.82, "kept": true, "best_val_acc": 0.82, "ts": 1784765155.8029027}
+{"iteration": 0, "event": "baseline", "val_acc": 0.825, "ts": 1784832929.6154156}
+{"iteration": 0, "event": "baseline", "val_acc": 0.82125, "ts": 1784851235.145984}
+{"iteration": 1, "event": "crash", "error": "training run exceeded timeout", "best_val_acc": 0.82125, "ts": 1784856666.4570298}
+{"iteration": 2, "event": "crash", "error": "training run exceeded timeout", "best_val_acc": 0.82125, "ts": 1784862095.7739706}
+{"iteration": 3, "event": "crash", "error": "training run exceeded timeout", "best_val_acc": 0.82125, "ts": 1784867518.4637034}
+{"iteration": 0, "event": "baseline", "val_acc": 0.81875, "ts": 1784914412.0918095}
+{"iteration": 1, "event": "scored", "val_acc": 0.81875, "kept": false, "best_val_acc": 0.81875, "ts": 1784921507.6818016}
+{"iteration": 2, "event": "scored", "val_acc": 0.8075, "kept": false, "best_val_acc": 0.81875, "ts": 1784928693.1332674}
+{"iteration": 0, "event": "baseline", "val_acc": 0.8175, "ts": 1786055344.0442407}
